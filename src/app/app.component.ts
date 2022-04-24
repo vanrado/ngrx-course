@@ -1,5 +1,10 @@
 import {Component, OnInit} from '@angular/core';
 import {NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router} from '@angular/router';
+import {Observable} from 'rxjs';
+import {AppState} from './auth/reducers';
+import {Store} from '@ngrx/store';
+import {map} from 'rxjs/operators';
+import {AuthActions} from './auth/action-types';
 
 @Component({
   selector: 'app-root',
@@ -8,37 +13,40 @@ import {NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Route
 })
 export class AppComponent implements OnInit {
 
-    loading = true;
+  loading = true;
+  isLoggedIn$: Observable<boolean>;
 
-    constructor(private router: Router) {
+  constructor(private router: Router, private store: Store<AppState>) {
 
-    }
+  }
 
-    ngOnInit() {
+  ngOnInit() {
 
-      this.router.events.subscribe(event  => {
-        switch (true) {
-          case event instanceof NavigationStart: {
-            this.loading = true;
-            break;
-          }
-
-          case event instanceof NavigationEnd:
-          case event instanceof NavigationCancel:
-          case event instanceof NavigationError: {
-            this.loading = false;
-            break;
-          }
-          default: {
-            break;
-          }
+    this.router.events.subscribe(event => {
+      switch (true) {
+        case event instanceof NavigationStart: {
+          this.loading = true;
+          break;
         }
-      });
 
-    }
+        case event instanceof NavigationEnd:
+        case event instanceof NavigationCancel:
+        case event instanceof NavigationError: {
+          this.loading = false;
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    });
 
-    logout() {
+    this.isLoggedIn$ = this.store.pipe(map(state => !!state['auth']?.user));
+  }
 
-    }
+  logout() {
+    this.store.dispatch(AuthActions.logout());
+    this.router.navigateByUrl('login');
+  }
 
 }
