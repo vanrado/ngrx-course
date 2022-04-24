@@ -22,6 +22,10 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    const user = localStorage.getItem('user');
+    if (!!user) {
+      this.store.dispatch(AuthActions.login({ user: JSON.parse(user) }));
+    }
 
     this.router.events.subscribe(event => {
       switch (true) {
@@ -48,7 +52,6 @@ export class AppComponent implements OnInit {
 
   logout() {
     this.store.dispatch(AuthActions.logout());
-    this.router.navigateByUrl('login');
   }
 
 }
