@@ -6,7 +6,7 @@ import {Router} from '@angular/router';
 import {noop} from 'rxjs';
 import {tap} from 'rxjs/operators';
 import {Store} from '@ngrx/store';
-import {login} from '../auth.actions';
+import {AuthActions} from '../action-types';
 
 @Component({
   selector: 'login',
@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
     if (this.form.valid) {
       this.auth.login(form.email, form.password)
         .pipe(tap((user) => {
-          this.store.dispatch(login({user}));
+          this.store.dispatch(AuthActions.login({user}));
           this.router.navigateByUrl('courses');
         }))
         .subscribe(noop, () => alert('login not successfull'));
